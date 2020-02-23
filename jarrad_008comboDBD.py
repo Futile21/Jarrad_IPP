@@ -40,18 +40,20 @@ for i in removelist:
 
 tracebar=[] #colorcop
 
-colours=["rgb(128, 43, 0)",    # COA
-         "rgb(0, 153, 0)",     # NUC
-         "rgb(255, 255, 0)",   # GAS
-         "rgb(255, 102, 0)",   # PEA
-         "rgb(0, 102, 102)",   # HYD
-         "rgb(0, 102, 255)",   # WIN
-         "rgb(204, 0, 153)",   # CSP
-         "rgb(204, 0, 0)",     # SPV
-         "rgb(0, 102, 102)",   # DPV
-         "rgb(51, 51, 51)",    # BIO
-         "rgb(64, 255, 0)",    # PST
-]
+# colours=["rgb(128, 43, 0)",    # COA
+#          "rgb(0, 153, 0)",     # NUC
+#          "rgb(255, 255, 0)",   # GAS
+#          "rgb(255, 102, 0)",   # PEA
+#          "rgb(0, 102, 102)",   # HYD
+#          "rgb(0, 102, 255)",   # WIN
+#          "rgb(204, 0, 153)",   # CSP
+#          "rgb(204, 0, 0)",     # SPV
+#          "rgb(0, 102, 102)",   # DPV
+#          "rgb(51, 51, 51)",    # BIO
+#          "rgb(64, 255, 0)",    # PST
+# ]
+
+colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770', '#dfe5ef', '#0a346f', '#4f4f4f']
 
 
 
@@ -73,7 +75,6 @@ navbar = html.Div([dbc.NavbarSimple(
         ],
     brand="Wind Energy Calculator",
     brand_style={'font-size': 35},
-    brand_href="#",
     color="primary",
     dark=True,)])
 
@@ -121,6 +122,20 @@ Slider= html.Div([daq.Slider(
 
 
 
+radios_inputPie = html.Div([
+    dbc.Label("Pie Graph", width=2),
+    dbc.RadioItems(
+        id="radios_inputPie",
+        options=[
+            {"label": "Installed capacity", "value": "E"},
+            {"label": "Energy produced", "value": "P"},
+        ],
+        inline=True,
+    )
+])
+
+
+
 
 
 
@@ -129,13 +144,32 @@ Slider= html.Div([daq.Slider(
 
 ####################################################################################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 downloadInput = dbc.FormGroup(
     [
-        dbc.Label("E amd P or both"),
+        dbc.Label("Installed capacity amd Energy produced or both"),
         dbc.Checklist(
             options=[
-                {"label": "E sdadsada", "value": "E"},
-                {"label": "P sadasdasd", "value": "P"},
+                {"label": "Installed capacity", "value": "E"},
+                {"label": "Energy produced", "value": "P"},
             ],
             value=["E"],
             id="switches-input",
@@ -338,7 +372,7 @@ years = CSIR_LC_2019_E['Year']
 PieLayout= {#"grid": {"rows": 1, "columns": 2},
             "height": 750,
             "legend": {
-            "x": 1.1,
+            "x": .95,
             "y": 0.55,
             # "xref": "paper",
             # "yref": "paper",
@@ -381,9 +415,9 @@ PieLayout["updatemenus"] = [
         # "pad": {"r": 10, "t": 87},
         "showactive": False,
         "type": "buttons",
-        "x": 0.1,
+        "x": 0.2,
         "xanchor": "right",
-        "y": 0,
+        "y": 0.0,
         "yanchor": "top"
     }
 ]
@@ -398,10 +432,10 @@ sliders_dict = {
         "xanchor": "right"
     },
     "transition": {"duration": 300, "easing": "cubic-in-out"},
-    "pad": {"b": 10, "t": 50},
-    "len": 0.9,
-    "x": 0.1,
-    "y": 0,
+    # "pad": {"b": 10, "t": 50},
+    "len": 0.95,
+    "x": 0.0,
+    "y": .0,
     "steps": []
 }
 PieData = [
@@ -559,7 +593,7 @@ app.layout = html.Div(children=[
         dbc.Row([
             dbc.Col(Dropdown,
                     sm=3,
-                    width={"offset": 2}),
+                    width={"offset": 1}),
             dbc.Col(Slider,
                     sm=3),
             dbc.Col(dbc.Checklist(
@@ -569,8 +603,10 @@ app.layout = html.Div(children=[
                                     ],
                             value=[],
                             switch=True,
-            ),
+                                    ),
 
+                    sm=1),
+            dbc.Col(radios_inputPie,
                     sm=2),
             ]),
         dbc.Row(
@@ -591,7 +627,7 @@ app.layout = html.Div(children=[
         ),
         dbc.Row(
             dbc.Col(PieGraphs,
-                    sm=6,
+                    sm=8,
                     align="center",
                     width={"offset": 2})
         ),
@@ -680,6 +716,93 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
 
 
 
+
+###############################################################################################################################################
+@app.callback(Output("Pie", "figure"),
+                [   Input('DropdownCase', 'value'),
+                    Input('slider', 'value'),
+                    Input('switches', 'value'),],
+            [
+                # State("RadioPower", "value"),
+             ],)
+def updateMapRSA(DropdownValue,sliderValue,switchesValue):
+    print("hey")
+    print(f'DropdownValue is {DropdownValue}')
+    print("hey 2")
+    # print(f'DropdownValue is {sliderValue}')
+    # print(f'DropdownValue is {type(sliderValue)}')
+    # print(f'SwitchesValue is {switchesValue}')
+
+#######################################
+
+    scenariosDict[DropdownValue]
+    DF_E=scenariosDict[DropdownValue]["E"]
+    DF_P=scenariosDict[DropdownValue]["P"]
+
+    traces = []
+
+    if len(switchesValue)>0: # True
+
+        for i, power in enumerate(powerlist):
+
+            traces.append(
+                go.Bar(x=[sliderValue],
+                       y=DF_P[DF_P['Year'] == sliderValue][power],
+                       name=power,
+                       legendgroup=power,
+                       # fillcolor=colours[i],
+                       marker=dict(color=colours[i]),
+                       xaxis='x2',#
+                       yaxis='y2',#
+                       )
+            )
+
+            traces.append(
+                go.Bar(x=[sliderValue],
+                       y=DF_E[DF_E['Year'] == sliderValue][power],
+                       name=power,
+                       legendgroup=power,
+
+                       showlegend=False,
+                       marker=dict(color=colours[i]),
+                       ))
+
+    else:
+        for i, power in enumerate(powerlist):
+            traces.append(
+                go.Bar(x=DF_P['Year'],
+                       y=DF_P[power],
+                       name=power,
+                       legendgroup=power,
+                       marker=dict(color=colours[i]),
+                       )
+            )
+
+            traces.append(
+                go.Bar(x=DF_E['Year'],
+                       y=DF_E[power],
+                       name=power,
+                       legendgroup=power,
+                       xaxis='x2',
+                       yaxis='y2',
+                       showlegend=False,
+                       marker=dict(color=colours[i]),
+                       ))
+
+    Powerlayout["title"]=DropdownValue
+
+    figure = dict(data=traces,layout=Powerlayout)
+    return figure
+
+
+
+
+
+
+
+
+
+
 @app.callback(
     Output("collapse", "is_open"),
     [Input("collapse-button", "n_clicks")],
@@ -689,6 +812,12 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+
+
+
+
+
 
 
 #####################################################################
