@@ -21,8 +21,8 @@ CSIR_LC_2019_P = pd.read_excel('2019-CSIR_LC.xlsx',sheet_name="IRP1_P").round(1)
 CSIR_LC_2019_E = pd.read_excel('2019-CSIR_LC.xlsx',sheet_name="IRP1_E").round(1)
 
 
-IRP2019_P2 = (IRP2019_E*0.8).round(1)
-IRP2019_E2 = (IRP2019_P*0.8).round(1)
+IRP2019_P2 = (IRP2019_P*0.8).round(1)
+IRP2019_E2 = (IRP2019_E*0.8).round(1)
 
 CSIR_LC_2019_P2 =(CSIR_LC_2019_P*0.8).round(1)
 CSIR_LC_2019_E2 = (CSIR_LC_2019_E*0.8).round(1)
@@ -79,71 +79,54 @@ navbar = html.Div([dbc.NavbarSimple(
 
 
 
-# Dropdown= html.Div([
- #             dcc.Dropdown(
- #                    id='Dropdown',
- #                    options=[
- #                        {'label': '2019 RP', 'value': "P", },
- #                        {'label': '2019 ', 'value': "E", },
- # ],
- #                    value='P',
- #
- #                    multi=False,
- #                    ),
- #            ],)
-
 
 Dropdown= html.Div([
-             dcc.Dropdown(
-                    id='Dropdown',
-                    options=[
-                        {'label': '2019 IRP', 'value':'IRP2019', },
-                        {'label': '2019 CSIR', 'value':'CSIR_LC_2019', },
- ],
-                    value='IRP2019',
-
-                    multi=False,
+                    dcc.Dropdown(
+                        id='DropdownCase',
+                        options=[
+                            {"label": "IPP 2019", "value": 'IRP2019'},
+                            {"label": "CSIR 2019", "value": 'CSIR_LC'},
+                            {"label": "IPP 2019 2", "value": 'IRP2019_2'},
+                            {"label": "CSIR 2019 2", "value": 'CSIR_LC_2'},
+                        ],
+                        value='IRP2019',
+                        multi=False,
                     ),
-            ],)
+                ],)
 
 
-DownloadOptions = html.Div(
-    [
-        dbc.DropdownMenu(
-            [
-                dbc.DropdownMenuItem("A button", id="dropdown-button"),
-                dbc.DropdownMenuItem(
-                    "Internal link", href="/l/components/dropdown_menu"
-                ),
-                dbc.DropdownMenuItem(
-                    "External Link", href="https://github.com"
-                ),
-                dbc.DropdownMenuItem(
-                    "External relative",
-                    href="/l/components/dropdown_menu",
-                    external_link=True,
-                ),
-            ],
-            label="Menu",
-        ),
-        html.P(id="item-clicks", className="mt-3"),
-    ]
-)
+
+Slider= html.Div([daq.Slider(
+                            id="slider",
+                            min=2018,
+                            max=2050,
+                            step=1,
+                            value=2018,
+                            marks={'2018': '2018',
+                                  '2034': '2034',
+                                  '2050': '2050'},
+                            size=450,
+                            handleLabel={"showCurrentValue": True,"label": "VALUE"
+                                         },
+                            included=False,
+                               ),],
+                 style={
+                        #'padding-top': 20,
+                        # 'padding-bottom': 20,
+                        # "width": '100vw',
+                        # "border": {"width":"10", "color":"black"},
+                        "height": "3vh",
+                        # "background-color": "yellow",
+                    })
 
 
-DropdownCase =html.Div([
-             dcc.Dropdown(
-                    id='DropdownCase',
-                    options=[
-                        {'label': 'Installed capacity [MW]', 'value': "P", },
-                        {'label': 'Energy produced [GWh]', 'value': "E", },
- ],
-                    value='P',
 
-                    multi=False,
-                    ),
-            ],)
-####
+
+
+
+
+
+
 ####################################################################################
 
 downloadInput = dbc.FormGroup(
@@ -175,10 +158,6 @@ downloadInput = dbc.FormGroup(
     ]
 )
 
-
-
-
-
 DropdownButton = dbc.Button(html.Div([html.A(
                                          children='IRP2019 download',
                                          id='download-link',
@@ -193,7 +172,6 @@ DropdownButton = dbc.Button(html.Div([html.A(
                                size="lg",
 
                                )
-
 
 card = dbc.Card(
     dbc.CardBody(
@@ -237,7 +215,7 @@ collapse = html.Div(
 
 Powerlayout={
   "grid": {"rows": 1, "columns": 2},
-  "title": "Installed capacity [MW]",
+  "title": "",
   # "width": 1300,
   "xaxis": {
     "ticks": "",
@@ -266,7 +244,7 @@ Powerlayout={
     "title": "Installed capacity [MW]",
     "autorange": False,
   },
-  "height": 900,
+  "height": 500,
   "legend": {
     # "x": 1.019163763066202,
     # "y": 0.5147321428571429,
@@ -305,6 +283,7 @@ Powerlayout={
     # "linecolor": "rgb(34,34,34)",
     "linewidth": 1,
     "autorange": False,
+    "title": "Energy produced [GWh]",
   },
 
   "barmode": "stack",
@@ -320,7 +299,7 @@ PowerGraphs= html.Div(
         #'padding-top': 20,
         'padding-bottom': 20,
         # "width": '100%',
-        "height": '100vw',
+        "height": '100',
 
 
     },
@@ -357,7 +336,7 @@ years = CSIR_LC_2019_E['Year']
 # fill in layout
 
 PieLayout= {#"grid": {"rows": 1, "columns": 2},
-            "height": 900,
+            "height": 750,
             "legend": {
             "x": 1.1,
             "y": 0.55,
@@ -399,7 +378,7 @@ PieLayout["updatemenus"] = [
             }
         ],
         "direction": "left",
-        "pad": {"r": 10, "t": 87},
+        # "pad": {"r": 10, "t": 87},
         "showactive": False,
         "type": "buttons",
         "x": 0.1,
@@ -550,7 +529,14 @@ html.A(
 
 
 
+###############################################################################################################################################
 
+scenariosDict={
+                'IRP2019': {"P":IRP2019_P,"E":IRP2019_E,},
+                'CSIR_LC': {"P":CSIR_LC_2019_P,"E":CSIR_LC_2019_E,},
+                'IRP2019_2': {"P": IRP2019_P2, "E": IRP2019_E2, },
+                'CSIR_LC_2': {"P": CSIR_LC_2019_P2, "E": CSIR_LC_2019_E2, },
+             }
 
 
 
@@ -572,20 +558,10 @@ app.layout = html.Div(children=[
               ]),
         dbc.Row([
             dbc.Col(Dropdown,
-                    sm=5),
-            dbc.Col(daq.Slider(id="slider",
-                               min=2018,
-                               max=2050,
-                               step=1,
-                               value=2018,
-                               marks={'2018': '2018',
-                                      '2034': '2034',
-                                      '2050': '2050'},
-                               handleLabel={"showCurrentValue": True,"label": "VALUE"},
-                               included=False,
-
-                               ),
-                    sm=5),
+                    sm=3,
+                    width={"offset": 2}),
+            dbc.Col(Slider,
+                    sm=3),
             dbc.Col(dbc.Checklist(
                             id="switches",
                             options=[
@@ -599,9 +575,9 @@ app.layout = html.Div(children=[
             ]),
         dbc.Row(
             dbc.Col(PowerGraphs,
-                    sm=8,
+                    sm=10,
                     align="center",
-                    width={"offset": 2})
+                    width={"offset": 1})
         ),
         dbc.Row(
             dbc.Col(html.Div(
@@ -619,20 +595,6 @@ app.layout = html.Div(children=[
                     align="center",
                     width={"offset": 2})
         ),
-        # dbc.Row(
-        #     dbc.Col([DropdownButton,
-        #              # html.A(
-        #              #     children='hey',
-        #              #     id='download-link',
-        #              #     download="test.xlsx",
-        #              #     href=href_data_downloadable,
-        #              #     target="_blank"
-        #              # )
-        #              ],
-        #             sm=6,
-        #             align="center",
-        #             width={"offset": 2})
-        # ),
     ]
 
     )
@@ -641,7 +603,7 @@ app.layout = html.Div(children=[
 
 ###############################################################################################################################################
 @app.callback(Output("PowerGraphs", "figure"),
-                [   Input('Dropdown', 'value'),
+                [   Input('DropdownCase', 'value'),
                     Input('slider', 'value'),
                     Input('switches', 'value'),],
             [
@@ -657,14 +619,9 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
 
 #######################################
 
-    if "IRP2019"==DropdownValue:
-        DF_E=CSIR_LC_2019_E  ##########################
-        print("one")
-        DF_P=CSIR_LC_2019_P
-    if "CSIR_LC_2019"==DropdownValue:
-        print("E")
-        DF_E=CSIR_LC_2019_E
-        DF_P=CSIR_LC_2019_P
+    scenariosDict[DropdownValue]
+    DF_E=scenariosDict[DropdownValue]["E"]
+    DF_P=scenariosDict[DropdownValue]["P"]
 
     traces = []
 
@@ -716,8 +673,7 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
                        marker=dict(color=colours[i]),
                        ))
 
-
-
+    Powerlayout["title"]=DropdownValue
 
     figure = dict(data=traces,layout=Powerlayout)
     return figure
