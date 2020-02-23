@@ -146,46 +146,37 @@ DropdownCase =html.Div([
 ####
 ####################################################################################
 
-downloadSwitches = dbc.FormGroup(
+downloadInput = dbc.FormGroup(
     [
-        dbc.Label("Toggle a bunch"),
+        dbc.Label("E amd P or both"),
         dbc.Checklist(
             options=[
-                {"label": "Option 1", "value": 1},
-                {"label": "Option 2", "value": 2},
+                {"label": "E sdadsada", "value": "E"},
+                {"label": "P sadasdasd", "value": "P"},
             ],
-            value=[],
+            value=["E"],
             id="switches-input",
             switch=True,
         ),
+        dbc.Label('Scenarios'),
+        dbc.Checklist(
+            id="scenarios",
+            options=[
+                {"label": "IPP 2019", "value": 'IRP2019'},
+                {"label": "CSIR 2019", "value": 'CSIR_LC'},
+                {"label": "IPP 2019 2", "value": 'IRP2019_2'},
+                {"label": "CSIR 2019 2", "value": 'CSIR_LC_2'},
+            ],
+            value=['IRP2019'],
+            labelCheckedStyle={"color": "red"},
+            inline=True,
+
+    ),
     ]
 )
 
 
 
-checklist = dbc.Checklist(
-    id="checklist-selected-style",
-    options=[
-        {"label": "Option 1", "value": 1},
-        {"label": "Option 2", "value": 2},
-        {"label": "Option 3", "value": 3},
-    ],
-    labelCheckedStyle={"color": "red"},
-)
-
-# def donwloadIRP2019_P():
-print('hey')
-df = IRP2019_P
-xlsx_io = io.BytesIO()
-writer = pd.ExcelWriter(xlsx_io, engine='xlsxwriter')
-IRP2019_P.to_excel(writer, index=False, sheet_name="IRP2019_P")
-IRP2019_E.to_excel(writer, index=False, sheet_name="IRP2019_E")
-writer.save()
-xlsx_io.seek(0)
-# https://en.wikipedia.org/wiki/Data_URI_scheme
-media_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-data = base64.b64encode(xlsx_io.read()).decode("utf-8")
-href_data_downloadable = f'data:{media_type};base64,{data}'
 
 
 DropdownButton = dbc.Button(html.Div([html.A(
@@ -198,7 +189,7 @@ DropdownButton = dbc.Button(html.Div([html.A(
                                id='downloadButton',
                                color="primary",
                                className="mr-1",
-                               href=href_data_downloadable,
+                               href='',
                                size="lg",
 
                                )
@@ -212,9 +203,8 @@ card = dbc.Card(
                 "This card has inline styles applied controlling the width. "
                 "You could also apply the same styles with a custom CSS class."
             ),
-        downloadSwitches,
+        downloadInput,
         DropdownButton,
-        checklist,
         ]
     ),
     color="dark",
@@ -418,7 +408,6 @@ PieLayout["updatemenus"] = [
         "yanchor": "top"
     }
 ]
-
 sliders_dict = {
     "active": 0,
     "yanchor": "top",
@@ -436,7 +425,6 @@ sliders_dict = {
     "y": 0,
     "steps": []
 }
-
 PieData = [
     {
         "labels": powerlist,
@@ -745,6 +733,50 @@ def toggle_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+
+#####################################################################
+
+def scenariosPicker(i):
+    switcher = {
+        'IRP2019': [IRP2019_P, IRP2019_E],
+        'CSIR_LC': [CSIR_LC_2019_P, CSIR_LC_2019_E]
+    }
+    return switcher.get(i, [])
+
+scenariosDict={
+                'IRP2019': {"P":IRP2019_P,"E":IRP2019_E,},
+                'CSIR_LC': {"P":CSIR_LC_2019_P,"E":CSIR_LC_2019_E,},
+                'IRP2019_2': {"P": IRP2019_P2, "E": IRP2019_E2, },
+                'CSIR_LC_2': {"P": CSIR_LC_2019_P2, "E": CSIR_LC_2019_E2, },
+             }
+
+
+@app.callback(
+    Output('download-link', 'href'),
+    [Input('switches-input', 'value'),
+     Input('scenarios', 'value')])
+def update_download_button(switches,scenarios):
+    print(switches)
+    print(scenarios)
+    xlsx_io = io.BytesIO()
+    writer = pd.ExcelWriter(xlsx_io, engine='xlsxwriter')
+    for scenario in scenarios:
+        for i in switches:
+            scenariosDict[scenario][i].to_excel(writer, sheet_name=scenario+" "+i)
+
+    writer.save()
+    xlsx_io.seek(0)
+#     https://en.wikipedia.org/wiki/Data_URI_scheme
+    media_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    data = base64.b64encode(xlsx_io.read()).decode("utf-8")
+    href_data_downloadable = f'data:{media_type};base64,{data}'
+    return href_data_downloadable
+
+
+
+
+
 
 
 if __name__ == '__main__':
