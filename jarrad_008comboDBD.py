@@ -1,3 +1,5 @@
+# Layout updating
+
 import os
 from pathlib import Path
 import dash
@@ -14,12 +16,14 @@ import base64
 
 IRP2019_P = pd.read_excel('2019-IRP.xlsx',sheet_name="IRP1_P").round(1)
 IRP2019_E = pd.read_excel('2019-IRP.xlsx',sheet_name="IRP1_E").round(1)
+
 CSIR_LC_2019_P = pd.read_excel('2019-CSIR_LC.xlsx',sheet_name="IRP1_P").round(1)
 CSIR_LC_2019_E = pd.read_excel('2019-CSIR_LC.xlsx',sheet_name="IRP1_E").round(1)
 
 
 IRP2019_P2 = (IRP2019_E*0.8).round(1)
 IRP2019_E2 = (IRP2019_P*0.8).round(1)
+
 CSIR_LC_2019_P2 =(CSIR_LC_2019_P*0.8).round(1)
 CSIR_LC_2019_E2 = (CSIR_LC_2019_E*0.8).round(1)
 
@@ -75,16 +79,28 @@ navbar = html.Div([dbc.NavbarSimple(
 
 
 
+# Dropdown= html.Div([
+ #             dcc.Dropdown(
+ #                    id='Dropdown',
+ #                    options=[
+ #                        {'label': '2019 RP', 'value': "P", },
+ #                        {'label': '2019 ', 'value': "E", },
+ # ],
+ #                    value='P',
+ #
+ #                    multi=False,
+ #                    ),
+ #            ],)
 
 
 Dropdown= html.Div([
              dcc.Dropdown(
                     id='Dropdown',
                     options=[
-                        {'label': 'Installed capacity [MW]', 'value': "P", },
-                        {'label': 'Energy produced [GWh]', 'value': "E", },
+                        {'label': '2019 IRP', 'value':'IRP2019', },
+                        {'label': '2019 CSIR', 'value':'CSIR_LC_2019', },
  ],
-                    value='P',
+                    value='IRP2019',
 
                     multi=False,
                     ),
@@ -127,7 +143,7 @@ DropdownCase =html.Div([
                     multi=False,
                     ),
             ],)
-
+####
 ####################################################################################
 
 downloadSwitches = dbc.FormGroup(
@@ -313,7 +329,8 @@ PowerGraphs= html.Div(
     style={
         #'padding-top': 20,
         'padding-bottom': 20,
-        "width": '100%',
+        # "width": '100%',
+        "height": '100vw',
 
 
     },
@@ -643,31 +660,23 @@ app.layout = html.Div(children=[
                 # State("RadioPower", "value"),
              ],)
 def updateMapRSA(DropdownValue,sliderValue,switchesValue):
-
-    # print(f'DropdownValue is {DropdownValue}')
+    print("hey")
+    print(f'DropdownValue is {DropdownValue}')
+    print("hey 2")
     # print(f'DropdownValue is {sliderValue}')
     # print(f'DropdownValue is {type(sliderValue)}')
     # print(f'SwitchesValue is {switchesValue}')
 
 #######################################
 
-    if "P"==DropdownValue:
-        # print("P")
-        title="INSTALLED capacity [MW]"
-        yTitle="Installed capacity [MW]"
-        DF_IRP=CSIR_LC_2019_E  ##########################
-        DF_CSIR=CSIR_LC_2019_P
-        c=False
-        yrange=[0,4.5e5]  #################
-    if "E"==DropdownValue:
-        # print("E")
-        DF_IRP=IRP2019_E
-        DF_CSIR=CSIR_LC_2019_E
-        title="ENGERGY produced [GWh]"
-        yTitle="Energy produced [GWh]"
-        c=True
-        yrange=[0,4.5e5]
-
+    if "IRP2019"==DropdownValue:
+        DF_E=CSIR_LC_2019_E  ##########################
+        print("one")
+        DF_P=CSIR_LC_2019_P
+    if "CSIR_LC_2019"==DropdownValue:
+        print("E")
+        DF_E=CSIR_LC_2019_E
+        DF_P=CSIR_LC_2019_P
 
     traces = []
 
@@ -677,7 +686,7 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
 
             traces.append(
                 go.Bar(x=[sliderValue],
-                       y=CSIR_LC_2019_E[CSIR_LC_2019_E['Year'] == sliderValue][power],
+                       y=DF_P[DF_P['Year'] == sliderValue][power],
                        name=power,
                        legendgroup=power,
                        # fillcolor=colours[i],
@@ -689,7 +698,7 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
 
             traces.append(
                 go.Bar(x=[sliderValue],
-                       y=CSIR_LC_2019_E[CSIR_LC_2019_E['Year'] == sliderValue][power],
+                       y=DF_E[DF_E['Year'] == sliderValue][power],
                        name=power,
                        legendgroup=power,
 
@@ -700,8 +709,8 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
     else:
         for i, power in enumerate(powerlist):
             traces.append(
-                go.Bar(x=CSIR_LC_2019_P['Year'],
-                       y=CSIR_LC_2019_P[power],
+                go.Bar(x=DF_P['Year'],
+                       y=DF_P[power],
                        name=power,
                        legendgroup=power,
                        marker=dict(color=colours[i]),
@@ -709,8 +718,8 @@ def updateMapRSA(DropdownValue,sliderValue,switchesValue):
             )
 
             traces.append(
-                go.Bar(x=CSIR_LC_2019_E['Year'],
-                       y=CSIR_LC_2019_E[power],
+                go.Bar(x=DF_E['Year'],
+                       y=DF_E[power],
                        name=power,
                        legendgroup=power,
                        xaxis='x2',
