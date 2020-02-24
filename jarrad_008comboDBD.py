@@ -111,8 +111,8 @@ Slider = html.Div([daq.Slider(
     handleLabel={"showCurrentValue": True, "label": "VALUE"
                  },
     included=False,
-), ],
-    style={
+    ),
+    ], style={
         # 'padding-top': 20,
         # 'padding-bottom': 20,
         # "width": '100vw',
@@ -139,8 +139,7 @@ radios_inputPie = html.Div([
 ####################################################################################
 
 
-downloadInput = dbc.FormGroup(
-    [
+FormInput = dbc.FormGroup([
         dbc.Label("Installed capacity amd Energy produced or both"),
         dbc.Checklist(
             options=[
@@ -165,43 +164,45 @@ downloadInput = dbc.FormGroup(
             inline=True,
 
         ),
-    ]
-)
+    ])
 
-DropdownButton = dbc.Button(html.Div([html.A(
-    children='IRP2019 download',
-    id='download-link',
-    download="IRP2019.xlsx",
-    target="_blank",
-    style={"text": "none"},
-)]),
-    id='downloadButton',
-    color="primary",
-    className="mr-1",
-    href='',
-    size="lg",
+DropdownButton = html.Div([
+                        dbc.Button(
+                                html.Div([html.A(
+                                        children='IRP2019 download',
+                                        id='download-link',
+                                        download="IRP2019.xlsx",
+                                        target="_blank",
+                                        style={"text": "none"},
+                                    )]),
+                                id='downloadButton',
+                                color="primary",
+                                className="mr-1",
+                                href='',
+                                size="lg",
+                            )
+                        ])
 
-)
+card = html.Div([
+    dbc.Card(
+        dbc.CardBody(
+            [
+                html.H5("Custom CSS", className="card-title"),
+                html.P(
+                    "This card has inline styles applied controlling the width. "
+                    "You could also apply the same styles with a custom CSS class."
+                ),
+                FormInput,
+                DropdownButton,
+            ]
+        ),
+        color="dark",
+        inverse=True
+        # style={"width": "18rem"},
+        )
+    ])
 
-card = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H5("Custom CSS", className="card-title"),
-            html.P(
-                "This card has inline styles applied controlling the width. "
-                "You could also apply the same styles with a custom CSS class."
-            ),
-            downloadInput,
-            DropdownButton,
-        ]
-    ),
-    color="dark",
-    inverse=True
-    # style={"width": "18rem"},
-)
-
-collapse = html.Div(
-    [
+collapse = html.Div([
         dbc.Button(
             "Open collapse",
             id="collapse-button",
@@ -212,8 +213,7 @@ collapse = html.Div(
             card,
             id="collapse",
         ),
-    ]
-)
+    ])
 
 ####################################################################################
 
@@ -296,16 +296,113 @@ Powerlayout = {
     "showlegend": True,
 }
 
-PowerGraphs = html.Div(
-    [dcc.Graph(id="PowerGraphs", figure=dict(data=tracebar, layout=Powerlayout))],
-    style={
-        # 'padding-top': 20,
-        'padding-bottom': 20,
-        # "width": '100%',
-        "height": '100',
+PowerGraphs = html.Div([
+        dcc.Graph(id="PowerGraphs", figure=dict(data=tracebar, layout=Powerlayout))
+        ], style={
+            # 'padding-top': 20,
+            'padding-bottom': 20,
+            # "width": '100%',
+            "height": '100',
+
+        },)
+
+
+####################################################################################
+
+Powerlayout_oneyear = {
+    "grid": {"rows": 1, "columns": 2},
+    "title": "",
+    # "width": 1300,
+    "xaxis": {
+        "ticks": "",
+        "mirror": False,
+        "showgrid": True,
+        "showline": True,
+        "zeroline": False,
+        "autorange": True,
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 2,
+        "title": "Years",
+        # "tick0" : 2018,
+        "dtick": 1,
 
     },
-)
+    "yaxis": {
+        "type": "linear",
+        "ticks": "",
+        # "domain": [0.55, 0.95],
+        "mirror": False,
+        "showgrid": True,
+        "showline": False,
+        "zeroline": False,
+        "range": [0, 16e4],
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 1,
+        "title": "Installed capacity [MW]",
+        "autorange": False,
+    },
+    "height": 500,
+    "legend": {
+        # "x": 1.019163763066202,
+        # "y": 0.5147321428571429,
+        # "xref": "paper",
+        # "yref": "paper",
+        # "bgcolor": "rgba(255, 255, 255, 0.5)",
+        "traceorder": "normal"
+    },
+    # "margin": {"l": 100},
+    "xaxis2": {
+        "type": "linear",
+        "ticks": "",
+        "title": "Years",
+        "anchor": "y2",
+        "domain": {"column": 0},
+        "mirror": False,
+        "showgrid": True,
+        "showline": True,
+        "zeroline": False,
+        "autorange": True,
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 2,
+        "dtick": 1,
+    },
+    "yaxis2": {
+        "type": "linear",
+        "ticks": "",
+        "anchor": "x2",
+        "domain": {"column": 1},
+        "mirror": False,
+        "showgrid": True,
+        "showline": False,
+        "zeroline": False,
+        "range": [0, 4.5e5],
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 1,
+        "autorange": False,
+        "title": "Energy produced [GWh]",
+    },
+
+    "barmode": "stack",
+    "autosize": False,
+    "showlegend": True,
+}
+
+PowerGraphs_oneyear = html.Div([
+        dcc.Graph(id="PowerGraphs_oneyear", figure=dict(data=tracebar, layout=Powerlayout))
+        ], style={
+            # 'padding-top': 20,
+            'padding-bottom': 20,
+            # "width": '100%',
+            "height": '100',
+
+        },)
+
+
+####################################################################################
 
 ######################### Text GenWind
 
@@ -492,25 +589,59 @@ PieLayout["sliders"] = [sliders_dict]
 ######################################
 
 
-PieGraphs = html.Div(
-    [dcc.Graph(id="Pie", figure=dict(data=PieData,
+PieGraphs = html.Div([
+    dcc.Graph(id="Pie", figure=dict(data=PieData,
                                      layout=PieLayout,
                                      frames=PieFrames))
-     ],
-    style={
+     ], style={
         # 'padding-top': 20,
         'padding-bottom': 20,
         # "height": 1500,
-    }
-)
+    })
 
-html.A(
-    'Download Data',
-    id='download-link',
-    download="table.xls",
-    href="",
-    target="_blank"
-)
+
+
+tab1_content = dbc.Card(
+                dbc.CardBody(
+                    [
+                        PowerGraphs,
+                    ]
+                ),
+                className="mt-3",
+            )
+
+
+tab2_content = dbc.Card(
+                dbc.CardBody(
+                    dbc.Row([
+                        dbc.Col(
+                            html.Div(
+                            [
+                                PowerGraphs_oneyear,
+                            ]),
+                        sm = 8,
+                        ),
+                    ])
+                ),
+                className="mt-3",
+            )
+
+
+# tab2_content = html.Div(
+                #     [
+                #         PowerGraphs_oneyear,
+                #     ]
+                # ),
+
+
+tabs = dbc.Tabs(
+    [
+        dbc.Tab(tab1_content, label="All the years"),
+        dbc.Tab(tab2_content, label="One Year at a time "),
+    ])
+
+
+
 
 
 ###############################################################################################################################################
@@ -520,39 +651,36 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, 'https://c
 app.layout = html.Div(children=[
     html.Div([navbar]),
     html.Div([
-
         dbc.Row([
             dbc.Col(Text_GenWind,
                     sm=6),
             dbc.Col(collapse,
                     sm=6),
-        ]),
+             ]),
+
         dbc.Row([
             dbc.Col(Dropdown,
                     sm=3,
                     width={"offset": 1}),
             dbc.Col(Slider,
                     sm=3),
-            dbc.Col(dbc.Checklist(
-                id="switches",
-                options=[
-                    {"label": "Option 1", "value": True},
-                ],
-                value=[],
-                switch=True,
-            ),
-
-                sm=1),
             dbc.Col(radios_inputPie,
                     sm=2),
         ]),
-        dbc.Row(
-            dbc.Col(PowerGraphs,
-                    sm=10,
+        dbc.Row([
+            dbc.Col(tabs,
+                    sm=12,
                     align="center",
-                    width={"offset": 1})
-        ),
-        dbc.Row(
+                    width={"offset": 0}
+                    ),
+        ]),
+        # dbc.Row([
+        #     dbc.Col(PowerGraphs,
+        #             sm=10,
+        #             align="center",
+        #             width={"offset": 1})
+        # ]),
+        dbc.Row([
             dbc.Col(html.Div(
                 [dbc.Jumbotron(
                     html.P("this is a Pie Chart")
@@ -561,29 +689,21 @@ app.layout = html.Div(children=[
                 sm=8,
                 align="center",
                 width={"offset": 2})
-        ),
-        dbc.Row(
+        ]),
+        dbc.Row([
             dbc.Col(PieGraphs,
                     sm=8,
                     align="center",
                     width={"offset": 2})
-        ),
-    ]
-
-    )
-
-])
+        ]),
+    ])])
 
 
 ###############################################################################################################################################
+
 @app.callback(Output("PowerGraphs", "figure"),
-              [Input('DropdownCase', 'value'),
-               Input('slider', 'value'),
-               Input('switches', 'value'), ],
-              [
-                  # State("RadioPower", "value"),
-              ], )
-def updateMapRSA(DropdownValue, sliderValue, switchesValue):
+              [Input('DropdownCase', 'value'),],)
+def updatePowerGraph(DropdownValue):
     print("hey")
     print(f'DropdownValue is {DropdownValue}')
     print("hey 2")
@@ -599,57 +719,87 @@ def updateMapRSA(DropdownValue, sliderValue, switchesValue):
 
     traces = []
 
-    if len(switchesValue) > 0:  # True
 
-        for i, power in enumerate(powerlist):
-            traces.append(
-                go.Bar(x=[sliderValue],
-                       y=DF_P[DF_P['Year'] == sliderValue][power],
-                       name=power,
-                       legendgroup=power,
-                       # fillcolor=colours[i],
-                       marker=dict(color=colours[i]),
-                       xaxis='x2',  #
-                       yaxis='y2',  #
-                       )
-            )
+    for i, power in enumerate(powerlist):
+        traces.append(
+            go.Bar(x=DF_P['Year'],
+                   y=DF_P[power],
+                   name=power,
+                   legendgroup=power,
+                   marker=dict(color=colours[i]),
+                   )
+        )
 
-            traces.append(
-                go.Bar(x=[sliderValue],
-                       y=DF_E[DF_E['Year'] == sliderValue][power],
-                       name=power,
-                       legendgroup=power,
-
-                       showlegend=False,
-                       marker=dict(color=colours[i]),
-                       ))
-
-    else:
-        for i, power in enumerate(powerlist):
-            traces.append(
-                go.Bar(x=DF_P['Year'],
-                       y=DF_P[power],
-                       name=power,
-                       legendgroup=power,
-                       marker=dict(color=colours[i]),
-                       )
-            )
-
-            traces.append(
-                go.Bar(x=DF_E['Year'],
-                       y=DF_E[power],
-                       name=power,
-                       legendgroup=power,
-                       xaxis='x2',
-                       yaxis='y2',
-                       showlegend=False,
-                       marker=dict(color=colours[i]),
-                       ))
+        traces.append(
+            go.Bar(x=DF_E['Year'],
+                   y=DF_E[power],
+                   name=power,
+                   legendgroup=power,
+                   xaxis='x2',
+                   yaxis='y2',
+                   showlegend=False,
+                   marker=dict(color=colours[i]),
+                   ))
 
     Powerlayout["title"] = DropdownValue
 
     figure = dict(data=traces, layout=Powerlayout)
     return figure
+
+
+
+###############################################################################################################################################
+
+@app.callback(Output("PowerGraphs_oneyear", "figure"),
+              [Input('DropdownCase', 'value'),
+               Input('slider', 'value'), ],
+              [
+                  # State("RadioPower", "value"),
+              ], )
+def updatePowerGraph_oneYear(DropdownValue, sliderValue):
+    print("hey 4")
+    print(f'DropdownValue is {DropdownValue}')
+    print("hey 5")
+
+    #######################################
+
+    scenariosDict[DropdownValue]
+    DF_E = scenariosDict[DropdownValue]["Installed capacity"]
+    DF_P = scenariosDict[DropdownValue]["Energy produced"]
+
+
+    traces = []
+
+
+
+    for i, power in enumerate(powerlist):
+        traces.append(
+            go.Bar(x=[str(sliderValue)],
+                   y=DF_E[DF_E['Year'] == sliderValue][power],
+                   name=power,
+                   legendgroup=power,
+                   # fillcolor=colours[i],
+                   marker=dict(color=colours[i]),
+                   xaxis='x2',  #
+                   yaxis='y2',  #
+                   )
+        )
+
+        traces.append(
+            go.Bar(x=[sliderValue],
+                   y=DF_P[DF_P['Year'] == sliderValue][power],
+                   name=power,
+                   legendgroup=power,
+                   showlegend=False,
+                   marker=dict(color=colours[i]),
+                   ))
+
+    Powerlayout_oneyear["title"] = DropdownValue
+
+    figure = dict(data=traces, layout=Powerlayout_oneyear)
+    return figure
+
+
 
 
 ############################################################################################################################################### PIE
