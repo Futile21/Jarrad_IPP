@@ -49,10 +49,12 @@ tracebar = []  # colorcop
 #          "rgb(51, 51, 51)",    # BIO
 #          "rgb(64, 255, 0)",    # PST
 # ]
-
-colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770',
-           '#dfe5ef', '#0a346f', '#4f4f4f']
-
+#               1           2           3       4           5           6           7           8       9           10
+# colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770',
+#            '#dfe5ef', '#0a346f', '#4f4f4f']
+#               11          12      13
+colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770'
+                    , '#0a346f', ]
 
 ###############################################################################################################################################
 
@@ -601,17 +603,38 @@ PieGraphs = html.Div([
 
 
 
-tab1_content = dbc.Card(
-                dbc.CardBody(
-                    [
-                        PowerGraphs,
-                    ]
-                ),
-                className="mt-3",
-            )
 
 
-tab2_content = dbc.Card(
+
+table = html.Div([
+                    go.Figure(data=[go.Table(
+                          header=dict(
+                            values=[ "<b>Power</b>","<b>E<b>","<b>P<b>"],
+                            line_color="black", fill_color='darkslategray',
+                            align='center', font=dict(color='black', size=20)
+                          ),
+                          cells=dict(
+                            values=[powerlist, np.array(g)[0],np.array(h)[0]],
+                            line_color='black',   #     fill_color=['#ff270f',np.array(colors)[b], np.array(colors)[c]],
+                            fill_color=[colours,'grey','grey'],
+                            align='center', font=dict(color='black', size=11)
+                          ))
+                    ])
+                ])
+
+
+
+
+tab1_content =html.Div([
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            PowerGraphs,
+                        ]
+                    ),
+                    className="mt-3",
+                )])
+tab2_content = html.Div([ dbc.Card(
                 dbc.CardBody(
                     dbc.Row([
                         dbc.Col(
@@ -624,14 +647,9 @@ tab2_content = dbc.Card(
                     ])
                 ),
                 className="mt-3",
-            )
+            )])
 
 
-# tab2_content = html.Div(
-                #     [
-                #         PowerGraphs_oneyear,
-                #     ]
-                # ),
 
 
 tabs = dbc.Tabs(
