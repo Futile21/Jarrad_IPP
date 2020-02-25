@@ -13,6 +13,7 @@ import numpy as np
 import dash_daq as daq
 import io
 import base64
+import dash_table
 
 IRP2019_P = pd.read_excel('2019-IRP.xlsx', sheet_name="IRP1_P").round(1)
 IRP2019_E = pd.read_excel('2019-IRP.xlsx', sheet_name="IRP1_E").round(1)
@@ -251,7 +252,7 @@ Powerlayout = {
         "title": "Installed capacity [MW]",
         "autorange": False,
     },
-    "height": 500,
+    "height": 600,
     "legend": {
         # "x": 1.019163763066202,
         # "y": 0.5147321428571429,
@@ -399,7 +400,7 @@ PowerGraphs_oneyear = html.Div([
             # 'padding-top': 20,
             'padding-bottom': 20,
             # "width": '100%',
-            "height": '100',
+            # "height": '100',
 
         },)
 
@@ -588,9 +589,6 @@ for year in years:
 
 PieLayout["sliders"] = [sliders_dict]
 
-######################################
-
-
 PieGraphs = html.Div([
     dcc.Graph(id="Pie", figure=dict(data=PieData,
                                      layout=PieLayout,
@@ -601,36 +599,37 @@ PieGraphs = html.Div([
         # "height": 1500,
     })
 
-
-g=(CSIR_LC_2019_E[CSIR_LC_2019_E['Year']==2018][powerlist])
-h=(CSIR_LC_2019_P[CSIR_LC_2019_P['Year']==2018][powerlist])
+######################################
 
 
-
-e =[go.Table(
-    header=dict(
-        values=["<b>Power</b>", "<b>E<b>", "<b>P<b>"],
-        line_color="black", fill_color='darkslategray',
-        align='center', font=dict(color='black', size=20)
-    ),
-    cells=dict(
-        values=[powerlist, np.array(g)[0], np.array(h)[0]],
-        line_color=['black'],  # fill_color=['#ff270f',np.array(colors)[b], np.array(colors)[c]],
-        fill_color=[colours, 'grey', 'grey'],
-        align='center', font=dict(color='black', size=11)
-    ))]
-
-
-
-Tablelayout = {
-    "title": "one",
-    # "width": 1300,
-    "height": 500,
+table_header_style = {
+    "backgroundColor": "rgb(2,21,70)",
+    "color": "white",
+    "textAlign": "center",
 }
 
+columns=[{'name': 'Energy Type', 'id': 'power'},
+         {'name': 'Installed capacity', 'id': 'Installed capacity', 'type': 'numeric'},
+         {'name': 'Energy produced', 'id': 'Energy produced', 'type': 'numeric'},
+         ]
 
-table=html.Div([dcc.Graph(id="",
-                 figure=dict(data=e, layout=Tablelayout))
+table=html.Div([
+                dash_table.DataTable(
+                        id="table",
+                        style_header=table_header_style,
+                        style_data_conditional=[
+                            {
+                                "if": {"column_id": "param"},
+                                "textAlign": "right",
+                                "paddingRight": 10,
+                            },
+                            {
+                                "if": {"row_index": "odd"},
+                                "backgroundColor": "white",
+                            },
+                        ],
+                        columns=columns,
+                    )
                 ])
 
 
@@ -655,7 +654,7 @@ tab2_content = html.Div([ dbc.Card(
                         ),
                         dbc.Col(
                             table,
-                            sm=4,
+                            sm=3,
                         ),
                     ])
                 ),
@@ -665,8 +664,7 @@ tab2_content = html.Div([ dbc.Card(
 
 
 
-tabs = dbc.Tabs(
-    [
+tabs = dbc.Tabs([
         dbc.Tab(tab1_content, label="All the years"),
         dbc.Tab(tab2_content, label="One Year at a time "),
     ])
@@ -696,6 +694,7 @@ app.layout = html.Div(children=[
             dbc.Col(Slider,
                     sm=3),
             dbc.Col(radios_inputPie,
+                    width={"offset": 1},
                     sm=2),
         ]),
         dbc.Row([
@@ -705,12 +704,6 @@ app.layout = html.Div(children=[
                     width={"offset": 0}
                     ),
         ]),
-        # dbc.Row([
-        #     dbc.Col(PowerGraphs,
-        #             sm=10,
-        #             align="center",
-        #             width={"offset": 1})
-        # ]),
         dbc.Row([
             dbc.Col(html.Div(
                 [dbc.Jumbotron(
@@ -954,21 +947,36 @@ def toggle_collapse(n, is_open):
 
 #####################################################################
 
-def scenariosPicker(i):
-    switcher = {
-        'IRP2019': [IRP2019_P, IRP2019_E],
-        'CSIR_LC': [CSIR_LC_2019_P, CSIR_LC_2019_E]
-    }
-    return switcher.get(i, [])
+
+@app.callback(
+    Output("table", "data"),
+    [Input('DropdownCase', 'value'),
+     Input('slider', 'value')],
+)
+def update_output(DropdownValue,slider):
+    print("one")
+
+    DF_E = scenariosDict[DropdownValue]["Installed capacity"]
+    DF_P = scenariosDict[DropdownValue]["Energy produced"]
+
+    dataupdate = []
+    # dictionary={}
+    cont=0
+    for power in powerlist:
+        dataDict = {'power': power,
+                    "Energy produced": DF_P[DF_P['Year']==slider][power],
+                    "Installed capacity": DF_E[DF_E['Year']==slider][power]}
+        dataupdate.append(dataDict)
+        cont+=1
+    #     print(p)
+    print("two")
+    print(dataupdate)
+    return dataupdate
 
 
-# scenariosDict = {
-#     'IRP2019': {"P": IRP2019_P, "E": IRP2019_E, },
-#     'CSIR_LC': {"P": CSIR_LC_2019_P, "E": CSIR_LC_2019_E, },
-#     'IRP2019_2': {"P": IRP2019_P2, "E": IRP2019_E2, },
-#     'CSIR_LC_2': {"P": CSIR_LC_2019_P2, "E": CSIR_LC_2019_E2, },
-# }
 
+
+#####################################################################
 
 @app.callback(
     Output('download-link', 'href'),
