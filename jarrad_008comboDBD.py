@@ -345,7 +345,7 @@ Powerlayout_oneyear = {
         "title": "Installed capacity [MW]",
         "autorange": False,
     },
-    "height": 500,
+    "height": 700,
     "legend": {
         # "x": 1.019163763066202,
         # "y": 0.5147321428571429,
@@ -625,7 +625,7 @@ e =[go.Table(
 Tablelayout = {
     "title": "one",
     # "width": 1300,
-    "height": 500,
+    "height": 400,
 }
 
 
@@ -660,6 +660,11 @@ tab2_content = html.Div([ dbc.Card(
                     ])
                 ),
                 className="mt-3",
+                style={
+                    # 'padding-top': 20,
+                    # 'padding-bottom': 20,
+                    "height": 10000,
+                }
             )])
 
 
