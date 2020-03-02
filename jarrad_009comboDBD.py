@@ -746,16 +746,20 @@ def updatePowerGraph(DropdownValue):
 
     for i, power in enumerate(powerlist):
         traces.append(
-            go.Bar(x=DF_P['Year'],
+            go.Scatter(x=DF_P['Year'],
                    y=DF_P[power],
                    name=power,
                    legendgroup=power,
                    marker=dict(color=colours[i]),
+                    stackgroup='one',
+                       line={'width': 0.75
+                             },
+                       fillcolor=colours[i],
                    )
         )
 
         traces.append(
-            go.Bar(x=DF_E['Year'],
+            go.Scatter(x=DF_E['Year'],
                    y=DF_E[power],
                    name=power,
                    legendgroup=power,
@@ -763,6 +767,9 @@ def updatePowerGraph(DropdownValue):
                    yaxis='y2',
                    showlegend=False,
                    marker=dict(color=colours[i]),
+                   stackgroup='Two',
+                       line={'width': 0.75
+                             },
                    ))
 
     Powerlayout["title"] = DropdownValue
