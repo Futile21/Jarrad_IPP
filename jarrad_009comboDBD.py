@@ -737,7 +737,7 @@ def updatePowerGraph(DropdownValue):
 
     #######################################
 
-    scenariosDict[DropdownValue]
+    # scenariosDict[DropdownValue]
     DF_E = scenariosDict[DropdownValue]["Installed capacity"]
     DF_P = scenariosDict[DropdownValue]["Energy produced"]
 
