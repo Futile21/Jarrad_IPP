@@ -21,6 +21,7 @@ IRP2019_E = pd.read_excel('2019-IRP.xlsx', sheet_name="IRP1_E").round(1)
 CSIR_LC_2019_P = pd.read_excel('2019-CSIR_LC.xlsx', sheet_name="IRP1_P").round(1)
 CSIR_LC_2019_E = pd.read_excel('2019-CSIR_LC.xlsx', sheet_name="IRP1_E").round(1)
 
+
 IRP2019_P2 = (IRP2019_P * 0.8).round(1)
 IRP2019_E2 = (IRP2019_E * 0.8).round(1)
 
@@ -35,15 +36,10 @@ CSIR_LC_2019_E2['Year']=IRP2019_P['Year']
 
 powerlist = list(CSIR_LC_2019_E.columns)
 print(powerlist)
-removelist = [powerlist[0], powerlist[11], powerlist[13]]
-removelist
-
-
+powerlist.remove('Year')
+print(powerlist)
 years = CSIR_LC_2019_E['Year']
 
-for i in removelist:
-    print(f'remove {i}')
-    powerlist.remove(i)
 
 # tracebar = []  # colorcop
 
@@ -63,8 +59,23 @@ for i in removelist:
 # colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770',
 #            '#dfe5ef', '#0a346f', '#4f4f4f']
 #               11          12      13
-colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770'
-                    , '#0a346f', ]
+# colours = ['#8c664a', '#ff270f', '#969696', '#e8d2ca', '#2760a6', '#9db1cf', '#eea632', '#ffed11', '#d7c700', '#007770'
+#                     , '#0a346f', ]
+
+
+colours = ['rgb(140, 102, 74)',
+           'rgb(255, 39, 15)',
+           'rgb(150, 150, 150)',
+           'rgb(232, 210, 202)',
+           'rgb(39, 96, 166)',
+           'rgb(157, 177, 207)',
+           'rgb(238, 166, 50)',
+           'rgb(255, 237, 17)',
+           'rgb(215, 199, 0)',
+           'rgb(0, 119, 112)',
+           'rgb(223, 229, 239)',
+           'rgb(10, 52, 111)',
+           'rgb(79, 79, 79)']
 
 ###############################################################################################################################################
 
@@ -91,7 +102,7 @@ navbar = html.Div([dbc.NavbarSimple(
             label="More",
         ),
     ],
-    brand="Wind Energy Calculator",
+    brand="Installed capacity and Energy produced thing",
     brand_style={'font-size': 35},
     color="primary",
     dark=True, )])
@@ -224,7 +235,7 @@ FormInput = dbc.FormGroup([
 DropdownButton = html.Div([
                         dbc.Button(
                                 html.Div([html.A(
-                                        children='Download Button',
+                                        children='Download',
                                         id='download-link',
                                         download="IRP2019.xlsx",
                                         target="_blank",
@@ -296,7 +307,7 @@ Powerlayout = {
         "showgrid": True,
         "showline": False,
         "zeroline": False,
-        "range": [0, 16e4],
+        "range": [0, 19e4],
         # "gridcolor": "rgb(255, 255, 255)",
         # "linecolor": "rgb(34,34,34)",
         "linewidth": 1,
@@ -501,7 +512,7 @@ Powerlayout_oneyear = {
         "showgrid": True,
         "showline": False,
         "zeroline": False,
-        "range": [0, 16e4],
+        "range": [0, 19e4],
         # "gridcolor": "rgb(255, 255, 255)",
         # "linecolor": "rgb(34,34,34)",
         "linewidth": 1,
@@ -942,7 +953,7 @@ tab4_content = html.Div([
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col(DropdownCase_Cost,
-                                        sm=3,
+                                        sm=4,
                                         width={"offset": 1}
                                         ),
                             ]),
@@ -976,8 +987,14 @@ tabs = dbc.Tabs([
 
 ###############################################################################################################################################
 
+
+
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, 'https://codepen.io/chriddyp/pen/bWLwgP.css',
                                                 dbc.themes.GRID])
+
+server = app.server
+
 app.layout = html.Div(children=[
     html.Div([navbar]),
     html.Div([
