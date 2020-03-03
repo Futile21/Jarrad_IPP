@@ -139,8 +139,10 @@ data = []
 cont = 0
 # dictionary={}
 for p in powerlist:
-    dataDict = {'power': p, "Energy produced": 12 + cont, "Installed capacity": 13 + cont * 2}
+    # dataDict = {'power': p, "Energy produced": 12 + cont, "Installed capacity": 13 + cont * 2}
+    dataDict = {'power': [1,2], "Energy produced": [12 + cont,"    yea"], "Installed capacity": 13 + cont * 2}
     cont += 1
+
     data.append(dataDict)
 #     print(p)
 
@@ -216,13 +218,28 @@ def update_output(DropdownValue,slider):
     dataupdate = []
     # dictionary={}
     cont=0
+    SUM_DF_P = DF_P[DF_P['Year']==slider][powerlist].values[0].sum()
+    SUM_DF_E = DF_E[DF_E['Year'] == slider][powerlist].values[0].sum()
     for power in powerlist:
+        # x= DF_P[DF_P['Year']==slider][power].values[0]
+        E=f"{DF_E[DF_E['Year']==slider][power].values[0]}     " \
+          f"[{round((DF_E[DF_E['Year']==slider][power].values[0]/SUM_DF_E)*100)} %]"
+
+        P=f"{DF_P[DF_P['Year']==slider][power].values[0]}     " \
+          f"[{round((DF_P[DF_P['Year']==slider][power].values[0]/SUM_DF_P)*100)} %]"
+
         dataDict = {'power': power,
-                    "Energy produced": DF_P[DF_P['Year']==slider][power],
-                    "Installed capacity": DF_E[DF_E['Year']==slider][power]}
+                    "Installed capacity": E,
+                    "Energy produced": P,
+                    }
         dataupdate.append(dataDict)
         cont+=1
     #     print(p)
+    dataupdate.append({
+                'power': "Total",
+                "Installed capacity": round(SUM_DF_E),
+                 "Energy produced": round(SUM_DF_P),})
+
     print("two")
     print(dataupdate)
     return [dataupdate]

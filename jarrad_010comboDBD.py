@@ -611,24 +611,24 @@ Costlayout = {
 }
 
 
-t=[go.Scatter(
-        x=years,
-        y=DF_E["COA"],
-        name='COA price',
-        fill='tozeroy',
-        # fillcolor=str(colours[1]),
-        line=dict(
-                    # color='firebrick',
-                    width=4,
-                    dash='dash'
-                    )
-        )]
+# t=[go.Scatter(
+#         x=years,
+#         y=DF_E["COA"],
+#         name='COA price',
+#         fill='tozeroy',
+#         # fillcolor=str(colours[1]),
+#         line=dict(
+#                     # color='firebrick',
+#                     width=4,
+#                     dash='dash'
+#                     )
+#         )]
 
 
 costGraph=html.Div([
             dcc.Graph(
                 figure=dict(
-                    data=t,
+                    data=[],
                     layout=Costlayout,
                     ),
                 id="costGraph"
@@ -839,11 +839,12 @@ table_header_style = {
 }
 
 columns=[{'name': 'Energy Type', 'id': 'power'},
-         {'name': 'Installed capacity', 'id': 'Installed capacity', 'type': 'numeric'},
-         {'name': 'Energy produced', 'id': 'Energy produced', 'type': 'numeric'},
+         {'name': 'Installed capacity [unit]', 'id': 'Installed capacity', 'type': 'numeric'},
+         {'name': 'Energy produced [unit]', 'id': 'Energy produced', 'type': 'numeric'},
          ]
 
-table=html.Div([
+table=html.Div([html.H3(children="Table",
+                        id="Table_Head"),
                 dash_table.DataTable(
                         id="table",
                         style_header=table_header_style,
@@ -1222,30 +1223,47 @@ def toggle_collapse(n, is_open):
 #####################################################################
 
 
-@app.callback(
+@app.callback([
     Output("table", "data"),
+    Output("Table_Head", "children"),],
+
     [Input('DropdownCase_Oneyear', 'value'),
      Input('slider', 'value')],
 )
 def update_output(DropdownValue,slider):
-    print("one")
-
     DF_E = scenariosDict[DropdownValue]["Installed capacity"]
     DF_P = scenariosDict[DropdownValue]["Energy produced"]
 
     dataupdate = []
     # dictionary={}
-    cont=0
+    cont = 0
+    SUM_DF_P = DF_P[DF_P['Year'] == slider][powerlist].values[0].sum()
+    SUM_DF_E = DF_E[DF_E['Year'] == slider][powerlist].values[0].sum()
     for power in powerlist:
+        # x= DF_P[DF_P['Year']==slider][power].values[0]
+        E = f"{DF_E[DF_E['Year'] == slider][power].values[0]}     " \
+            f"[{round((DF_E[DF_E['Year'] == slider][power].values[0] / SUM_DF_E) * 100)} %]"
+
+        P = f"{DF_P[DF_P['Year'] == slider][power].values[0]}     " \
+            f"[{round((DF_P[DF_P['Year'] == slider][power].values[0] / SUM_DF_P) * 100)} %]"
+
         dataDict = {'power': power,
-                    "Energy produced": DF_P[DF_P['Year']==slider][power],
-                    "Installed capacity": DF_E[DF_E['Year']==slider][power]}
+                    "Installed capacity": E,
+                    "Energy produced": P,
+                    }
         dataupdate.append(dataDict)
-        cont+=1
+        cont += 1
     #     print(p)
+    dataupdate.append({
+        'power': "Total",
+        "Installed capacity": round(SUM_DF_E),
+        "Energy produced": round(SUM_DF_P), })
+
     print("two")
+    print(dataupdate)
+    Table_Head = f"{DropdownValue} {slider} Year"
     # print(dataupdate)
-    return dataupdate
+    return dataupdate,Table_Head
 
 
 #####################################################################

@@ -595,9 +595,6 @@ app.layout = html.Div(children=[
 
 
 
-
-
-
 @app.callback([
                 Output("IRP2019_Div", "hidden"),
                 Output("CSIR_LC_Div", "hidden"),
