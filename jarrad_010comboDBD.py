@@ -224,7 +224,7 @@ FormInput = dbc.FormGroup([
 DropdownButton = html.Div([
                         dbc.Button(
                                 html.Div([html.A(
-                                        children='IRP2019 download',
+                                        children='Download Button',
                                         id='download-link',
                                         download="IRP2019.xlsx",
                                         target="_blank",
@@ -238,15 +238,14 @@ DropdownButton = html.Div([
                             )
                         ])
 
-card = html.Div([
+DL_card = html.Div([
     dbc.Card(
         dbc.CardBody(
             [
-                html.H5("Custom CSS", className="card-title"),
-                html.P(
-                    "This card has inline styles applied controlling the width. "
-                    "You could also apply the same styles with a custom CSS class."
-                ),
+                html.H5("Download options", className="card-title"),
+                html.P("How to Download  pick. "),
+                html.P(children="Push Download Button",
+                       style={'padding-bottom': 10,}),
                 FormInput,
                 DropdownButton,
             ]
@@ -257,18 +256,18 @@ card = html.Div([
         )
     ])
 
-collapse = html.Div([
-        dbc.Button(
-            "Open collapse",
-            id="collapse-button",
-            className="mb-3",
-            color="success",
-        ),
-        dbc.Collapse(
-            card,
-            id="collapse",
-        ),
-    ])
+# collapse = html.Div([
+#         dbc.Button(
+#             "Open collapse",
+#             id="collapse-button",
+#             className="mb-3",
+#             color="success",
+#         ),
+#         dbc.Collapse(
+#             card,
+#             id="collapse",
+#         ),
+#     ])
 
 ####################################################################################
 
@@ -985,7 +984,7 @@ app.layout = html.Div(children=[
         dbc.Row([
             dbc.Col(Text_GenWind,
                     sm=6),
-            dbc.Col(collapse,
+            dbc.Col(DL_card,
                     sm=6),
              ]),
 
@@ -1209,15 +1208,15 @@ def updateMapRSA(DropdownValue, radios_inputPie):
     return figure
 
 
-@app.callback(
-    Output("collapse", "is_open"),
-    [Input("collapse-button", "n_clicks")],
-    [State("collapse", "is_open")],
-)
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+# @app.callback(
+#     Output("collapse", "is_open"),
+#     [Input("collapse-button", "n_clicks")],
+#     [State("collapse", "is_open")],
+# )
+# def toggle_collapse(n, is_open):
+#     if n:
+#         return not is_open
+#     return is_open
 
 
 #####################################################################
