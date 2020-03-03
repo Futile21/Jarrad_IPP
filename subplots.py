@@ -416,7 +416,7 @@ print(colours[0])
 Costlayout = {
     "title": "Cost",
     # "width": 1300,
-    # "height": 600,
+    "height": 600,
     "legend": {
         "traceorder": "normal"
     },

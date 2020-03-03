@@ -570,6 +570,73 @@ PowerGraphs_oneyear = html.Div([
 
 ####################################################################################
 
+
+Costlayout = {
+    "title": "Cost",
+    # "width": 1300,
+    "height": 600,
+    "legend": {
+        "traceorder": "normal"
+    },
+    "xaxis": {
+        "ticks": "",
+        "mirror": False,
+        "showgrid": True,
+        "showline": True,
+        "zeroline": False,
+        "autorange": True,
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 2,
+        "title": "Years",
+    },
+    "yaxis": {
+        "type": "linear",
+        "ticks": "",
+        # "domain": [0.55, 0.95],
+        "mirror": False,
+        "showgrid": True,
+        "showline": False,
+        "zeroline": True,
+        # "range": [0, 16e4],
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 2,
+        "title": "Cost in Rands",
+        "autorange": True,
+    },
+    # "autosize": True,
+    "showlegend": True,
+    # "width": '1500',
+}
+
+
+t=[go.Scatter(
+        x=years,
+        y=DF_E["COA"],
+        name='COA price',
+        fill='tozeroy',
+        # fillcolor=str(colours[1]),
+        line=dict(
+                    # color='firebrick',
+                    width=4,
+                    dash='dash'
+                    )
+        )]
+
+
+costGraph=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=t,
+                    layout=Costlayout,
+                    ),
+                id="costGraph"
+                ),
+            ],)
+
+
+
 ######################### Text GenWind
 
 Text_GenWind = html.Div([
@@ -817,7 +884,6 @@ tab1_content =html.Div([
                         )
                     ])
 
-
 tab2_content = html.Div([
                     dbc.Card(
                         dbc.CardBody([
@@ -871,12 +937,37 @@ tab3_content = html.Div([
                     className="mt-3",
                     )])
 
+tab4_content = html.Div([
+                    dbc.Card(
+                        dbc.CardBody([
+                            dbc.Row([
+                                dbc.Col(DropdownCase_Cost,
+                                        sm=3,
+                                        width={"offset": 1}
+                                        ),
+                            ]),
+                            dbc.Row([
+                                dbc.Col([
+                                    costGraph,
+                                    IRP2019_Div,
+                                    CSIR_LC_Div,
+                                    IRP2019_2_Div,
+                                    CSIR_LC_2_Div,
+                                ],
+                                    sm=10,
+                                    width={"offset": 1}
+                                    ),
+                            ]),
 
+                        ]),
+                    className="mt-3",
+                    )])
 
 tabs = dbc.Tabs([
         dbc.Tab(tab1_content, label="All the years"),
         dbc.Tab(tab2_content, label="One Year at a time "),
         dbc.Tab(tab3_content, label="Pie "),
+        dbc.Tab(tab4_content, label="Cost "),
     ])
 
 
@@ -1157,6 +1248,72 @@ def update_output(DropdownValue,slider):
     return dataupdate
 
 
+#####################################################################
+
+
+@app.callback([
+                Output("costGraph", "figure"),
+                Output("IRP2019_Div", "hidden"),
+                Output("CSIR_LC_Div", "hidden"),
+                Output("IRP2019_2_Div", "hidden"),
+                Output("CSIR_LC_2_Div", "hidden"),
+               ],
+              [Input('DropdownCase_Cost', 'value'),],)
+def updatePowerGraph(DropdownValue):
+    print("hey")
+    print(f'DropdownValue is {DropdownValue}')
+    print("hey 2")
+    # print(f'DropdownValue is {sliderValue}')
+    # print(f'DropdownValue is {type(sliderValue)}')
+    # print(f'SwitchesValue is {switchesValue}')
+
+    #######################################
+
+    # scenariosDict[DropdownValue]
+    IRP2019 = True
+    CSIR_LC = True
+    IRP2019_2 = True
+    CSIR_LC_2 = True
+
+    if "IRP2019" in DropdownValue:
+        IRP2019=False
+
+
+    if "CSIR_LC" in DropdownValue:
+        CSIR_LC=False
+
+
+    if "IRP2019_2" in DropdownValue:
+        IRP2019_2=False
+
+
+    if "CSIR_LC_2" in DropdownValue:
+        CSIR_LC_2=False
+
+
+    traces = []
+    for j in DropdownValue:
+        print(f"j is {j} ")
+        DF_cost=scenariosDict[j]["Energy produced"]
+
+
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['COA'],
+                name="COA price "+j,
+                # fill='tozeroy',
+                line=dict(
+                    # color='firebrick',
+                    width=4,
+                    dash='dash'),
+               )
+            )
+
+    print(traces)
+    figure = dict(data=traces, layout=Costlayout)
+
+    return figure, IRP2019, CSIR_LC,IRP2019_2,CSIR_LC_2
 
 
 #####################################################################
