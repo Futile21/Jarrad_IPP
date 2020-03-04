@@ -127,9 +127,9 @@ options=[{"label": i, "value": i} for i in namestems],
 
 
 
-Dropdown = html.Div([
+DropdownMarker = html.Div([
     dcc.Dropdown(
-        id='DropdownCase',
+        id='DropdownM',
         options=options[0],
         value='circle',
         multi=False,
@@ -299,7 +299,7 @@ app.layout = html.Div(children=[
                     width={"offset": 0}),
             dbc.Col([
                     html.Label('Markers'),
-                    Dropdown,],
+                    DropdownMarker,],
                     sm=2,
                     width={"offset": 0}),
             dbc.Col(Slider,
@@ -332,15 +332,15 @@ app.layout = html.Div(children=[
 
 
 @app.callback(Output("Graph", "figure"),
-              [Input('DropdownCase', 'value'),
+              [Input('DropdownM', 'value'),
                Input('Fillswitches', 'value'),
                Input('lineW', 'value'),
                Input('MarkerW', 'value'),
                Input('slider', 'value'),
                Input('radios_dash', 'value'),],)
-def updatePowerGraph(DropdownValue,Fillswitches,lineW,MarkerW,slider,radios_dash):
+def updatePowerGraph(DropdownM,Fillswitches,lineW,MarkerW,slider,radios_dash):
     print("hey")
-    print(f'DropdownValue is {DropdownValue}')
+    print(f'DropdownValue is {DropdownM}')
     print(f'Fillswitches is {Fillswitches}')
     print(f'lineW is {lineW}')
     print("hey 2")
@@ -353,6 +353,8 @@ def updatePowerGraph(DropdownValue,Fillswitches,lineW,MarkerW,slider,radios_dash
     # scenariosDict[DropdownValue]
     # DF_E = scenariosDict[DropdownValue]["Installed capacity"]
     # DF_P = scenariosDict[DropdownValue]["Energy produced"]
+    DF_E = IRP2019_P
+    DF_P = IRP2019_E
 
     traces = []
 
@@ -382,7 +384,7 @@ def updatePowerGraph(DropdownValue,Fillswitches,lineW,MarkerW,slider,radios_dash
                       "dash" : radios_dash,
                      },
                 fillcolor=colours[i].replace(")", f",{slider})").replace("rgb", "rgba"),
-                marker_symbol=DropdownValue,
+                marker_symbol=DropdownM,
                 )
         )
 

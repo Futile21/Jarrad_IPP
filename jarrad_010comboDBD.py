@@ -203,6 +203,163 @@ radios_inputPie = html.Div([
 ])
 
 ####################################################################################
+####################################################################################
+
+from plotly.validators.scatter.marker import SymbolValidator
+
+
+raw_symbols = SymbolValidator().values
+namestems = []
+for i in range(0,len(raw_symbols),2):
+    name = raw_symbols[i+1]
+    namestems.append(name.replace("-open", "").replace("-dot", ""))
+
+namestems=set(namestems)
+options=[{"label": i, "value": i} for i in namestems],
+
+
+
+
+
+DropdownMarker = html.Div([
+    dcc.Dropdown(
+        id='DropdownM',
+        options=options[0],
+        value='circle',
+        multi=False,
+    ),
+], )
+
+slidertest = html.Div([daq.Slider(
+    id="slidertest",
+    min=0,
+    max=1,
+    step=0.05,
+    value=0.5,
+    marks={'0': '0',
+           '0.5': '0.5',
+           '1': '1'},
+    size=450,
+    handleLabel={"showCurrentValue": True, "label": "VALUE"
+                 },
+    included=False,
+    ),
+    ], style={
+        "height": "3vh",
+    })
+
+radios_dash = html.Div([   #['solid', 'dot', 'dash', 'longdash', 'dashdot', 'longdashdot']
+    dbc.Label("Dash",
+              # align="center",
+              ),
+    dbc.RadioItems(
+        id="radios_dash",
+        options=[
+            {"label": "solid", "value": "solid"},
+            {"label": "Dash", "value": "dash"},
+            {"label": "dot", "value": "dot"},
+            {"label": "Dash + dot", "value": "dashdot"},
+            {"label": "longdash", "value": "longdash"},
+            {"label": "longdashdot", "value": "longdashdot"},
+        ],
+        inline=True,
+        value="solid",
+        # inline=True,
+    )
+])
+
+
+Fillswitches = html.Div([
+                dbc.Checklist(
+                    options=[
+                        {"label": "line", "value": "line"},
+                        {"label": "markers", "value": "markers"},
+                    ],
+                    value=['line'],
+                    id="Fillswitches",
+                    switch=True,
+                ),])
+
+lineW = html.Div([
+        html.P("Line range 0-25"),
+        dbc.Input(type="number", min=0, max=10, step=0.25,id="lineW"),],)
+
+MarkerW = html.Div([
+        html.P("Marker range 0-25"),
+        dbc.Input(type="number", min=0, max=10, step=0.25,id="MarkerW"),],)
+
+layout = {
+    "title": "TEST",
+    # "width": '6h',
+    "height": 600,
+    "legend": {
+        # "x": 1.019163763066202,
+        # "y": 0.5147321428571429,
+        # "xref": "paper",
+        # "yref": "paper",
+        # "bgcolor": "rgba(255, 255, 255, 0.5)",
+        "traceorder": "normal"
+        },
+    # "barmode": "stack",
+    "autosize": False,
+    "showlegend": True,
+    "width": '1500',
+    "xaxis": {
+        'anchor': 'y',
+        'domain': [0.0, 1],
+
+        "ticks": "",
+        "mirror": False,
+        "showgrid": True,
+        "showline": True,
+        "zeroline": False,
+        "autorange": True,
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 2,
+        "title": "Years",
+    },
+    "yaxis": {
+        'anchor': 'x',
+        'domain': [0.0, 1.0],
+
+        "type": "linear",
+        "ticks": "",
+        # "domain": [0.55, 0.95],
+        "mirror": False,
+        "showgrid": True,
+        "showline": False,
+        "zeroline": False,
+        # "range": [0, 16e4],
+        # "gridcolor": "rgb(255, 255, 255)",
+        # "linecolor": "rgb(34,34,34)",
+        "linewidth": 1,
+        "title": "Y Name",
+        "autorange": True,
+    }
+    }
+
+
+
+Graph=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=[],
+                    layout=layout,
+                    ),
+                id='Graph',
+            ),
+            ])
+
+
+
+
+
+####################################################################################
+####################################################################################
+
+
+
 
 
 FormInput = dbc.FormGroup([
@@ -1025,7 +1182,7 @@ app.layout = html.Div(children=[
         dbc.Row([
             dbc.Col(html.Div(
                 [dbc.Jumbotron(
-                    html.P("this is a Pie Chart")
+                    html.P("tester")
                 )]
             ),
                 sm=8,
@@ -1038,9 +1195,117 @@ app.layout = html.Div(children=[
         #             align="center",
         #             width={"offset": 2})
         # ]),
+        dbc.Row([
+            dbc.Col([
+                dbc.Row([
+                    dbc.Col(Fillswitches, align="end", width={"offset": 1}),
+                    dbc.Col([radios_dash], align="end", width={"offset": 1}),
+                ],
+                    align='end')
+            ],
+                width={"offset": 0.5},
+                sm=2),
+            dbc.Col([lineW],
+                    sm=2,
+                    width={"offset": 0}),
+            dbc.Col([MarkerW],
+                    sm=2,
+                    width={"offset": 0}),
+            dbc.Col([
+                html.Label('Markers'),
+                DropdownMarker, ],
+                sm=2,
+                width={"offset": 0}),
+            dbc.Col(slidertest,
+                    sm=3),
+            # dbc.Col(radios_inputPie,
+            #         width={"offset": 1},
+            #         sm=1),
+
+        ]),
+        # subplot,
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    Graph,
+                ],
+                    sm=10,
+                    width={"offset": 1}
+                ),
+            ]),
+        ])
     ])])
 
 
+###############################################################################################################################################
+###############################################################################################################################################
+###############################################################################################################################################
+
+@app.callback(Output("Graph", "figure"),
+              [Input('DropdownM', 'value'),
+               Input('Fillswitches', 'value'),
+               Input('lineW', 'value'),
+               Input('MarkerW', 'value'),
+               Input('slidertest', 'value'),
+               Input('radios_dash', 'value'),],)
+def updatePowerGraph(DropdownM,Fillswitches,lineW,MarkerW,slider,radios_dash):
+    print("hey")
+    print(f'DropdownValue is {DropdownM}')
+    print(f'Fillswitches is {Fillswitches}')
+    print(f'lineW is {lineW}')
+    print("hey 2")
+    # print(f'DropdownValue is {sliderValue}')
+    # print(f'DropdownValue is {type(sliderValue)}')
+    # print(f'SwitchesValue is {switchesValue}')
+
+    #######################################
+
+    # scenariosDict[DropdownValue]
+    # DF_E = scenariosDict[DropdownValue]["Installed capacity"]
+    # DF_P = scenariosDict[DropdownValue]["Energy produced"]
+    DF_E = IRP2019_P
+    DF_P = IRP2019_E
+
+    traces = []
+
+    if 'markers' in Fillswitches:
+        Mode='markers'
+
+    if 'line' in Fillswitches:
+        Mode='lines'
+
+    if ('line' in Fillswitches) and ('markers' in Fillswitches):
+        Mode='lines+markers'
+
+    # print(f'mode is {Mode}')
+    for i, power in enumerate(powerlist):
+        traces.append(
+            go.Scatter(x=DF_P['Year'],
+                y=DF_P[power],
+                name=power,
+                legendgroup=power,
+                mode=Mode,
+                marker=dict(color=colours[i],
+                            size=MarkerW,
+                            # symbols='x',
+                            ),
+                stackgroup='one',
+                line={'width': lineW,
+                      "dash" : radios_dash,
+                     },
+                fillcolor=colours[i].replace(")", f",{slider})").replace("rgb", "rgba"),
+                marker_symbol=DropdownM,
+                )
+        )
+
+
+    # layout["title"] = DropdownValue
+
+    figure = dict(data=traces, layout=layout)
+    return figure
+
+###############################################################################################################################################
+###############################################################################################################################################
 ###############################################################################################################################################
 
 @app.callback(Output("PowerGraphs", "figure"),
