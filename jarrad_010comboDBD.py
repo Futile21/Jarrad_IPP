@@ -14,6 +14,10 @@ import dash_daq as daq
 import io
 import base64
 import dash_table
+from random import random
+from urllib.request import urlopen
+import json
+
 
 IRP2019_P = pd.read_excel('2019-IRP.xlsx', sheet_name="IRP1_P").round(1)
 IRP2019_E = pd.read_excel('2019-IRP.xlsx', sheet_name="IRP1_E").round(1)
@@ -162,6 +166,22 @@ DropdownCase_Cost = html.Div([
         multi=True,
     ),
 ], )
+
+DropdownCase_emission = html.Div([
+    dcc.Dropdown(
+        id='DropdownCase_emission',
+        options=[
+            {"label": "IPP 2019", "value": 'IRP2019'},
+            {"label": "CSIR 2019", "value": 'CSIR_LC'},
+            {"label": "IPP 2019 2", "value": 'IRP2019_2'},
+            {"label": "CSIR 2019 2", "value": 'CSIR_LC_2'},
+        ],
+        value=['IRP2019'],
+        multi=True,
+    ),
+], )
+
+
 
 
 Slider = html.Div([daq.Slider(
@@ -592,7 +612,7 @@ PowerGraphs = html.Div([
 
         },)
 
-IRP2019_Div=html.Div([
+IRP2019_Div_cost=html.Div([
             dcc.Graph(
                 figure=dict(
                     data=l['IRP2019']['data'],
@@ -601,11 +621,10 @@ IRP2019_Div=html.Div([
                 # id='IRP2019_Div',
             ),
             ],
-            id='IRP2019_Div',
+            id='IRP2019_Div_cost',
             hidden=True,)
 
-
-CSIR_LC_Div=html.Div([
+CSIR_LC_Div_cost=html.Div([
             dcc.Graph(
                 figure=dict(
                     data=l['CSIR_LC']['data'],
@@ -613,10 +632,9 @@ CSIR_LC_Div=html.Div([
                     ),
                 # id='IRP2019',
             ), ],
-            id='CSIR_LC_Div',
+            id='CSIR_LC_Div_cost',
             hidden=True,)
-
-IRP2019_2_Div=html.Div([
+IRP2019_2_Div_cost=html.Div([
             dcc.Graph(
                 figure=dict(
                     data=l['IRP2019_2']['data'],
@@ -624,10 +642,9 @@ IRP2019_2_Div=html.Div([
                     ),
                 # id='IRP2019'
                 ), ],
-            id='IRP2019_2_Div',
+            id='IRP2019_2_Div_cost',
             hidden=True)
-
-CSIR_LC_2_Div=html.Div([
+CSIR_LC_2_Div_cost=html.Div([
             dcc.Graph(
                 figure=dict(
                     data=l['CSIR_LC_2']['data'],
@@ -635,7 +652,58 @@ CSIR_LC_2_Div=html.Div([
                     ),
                 # id='IRP2019'
                 ), ],
-            id='CSIR_LC_2_Div',
+            id='CSIR_LC_2_Div_cost',
+            hidden=True)
+
+
+
+
+
+
+IRP2019_Div_emission=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=l['IRP2019']['data'],
+                    layout=IRP2019_Divlayout,
+                    ),
+                # id='IRP2019_Div',
+            ),
+            ],
+            id='IRP2019_Div_emission',
+            hidden=True,)
+
+
+CSIR_LC_Div_emission=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=l['CSIR_LC']['data'],
+                    layout=CSIR_LC_Divlayout,
+                    ),
+                # id='IRP2019',
+            ), ],
+            id='CSIR_LC_Div_emission',
+            hidden=True,)
+
+IRP2019_2_Div_emission=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=l['IRP2019_2']['data'],
+                    layout=IRP2019_2_Divlayout,
+                    ),
+                # id='IRP2019'
+                ), ],
+            id='IRP2019_2_Div_emission',
+            hidden=True)
+
+CSIR_LC_2_Div_emission=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=l['CSIR_LC_2']['data'],
+                    layout=CSIR_LC_2_Divlayout,
+                    ),
+                # id='IRP2019'
+                ), ],
+            id='CSIR_LC_2_Div_emission',
             hidden=True)
 
 
@@ -799,6 +867,119 @@ costGraph=html.Div([
                     layout=Costlayout,
                     ),
                 id="costGraph"
+                ),
+            ],)
+
+
+
+
+
+
+
+
+emission_layout = {
+    "title": "emission_layout",
+    # "width": 1300,
+    "height": 1000,
+    # "margin": {"l": 100},
+    "barmode": "stack",
+    "autosize": True,
+    "showlegend": True,
+    'xaxis': {
+            'anchor': 'y',
+            'domain': [0.0, 0.45],
+            'showgrid': True,
+            'showline': True,
+            'zeroline': False,
+            'linewidth': 2,
+            'mirror': False,
+              },
+
+    'xaxis2': {
+            'anchor': 'y2',
+            'domain': [0.55, 1.0],
+            'showgrid': True,
+            'showline': True,
+            'zeroline': False,
+            'linewidth': 2,
+            'mirror': False,
+               },
+    'yaxis': {
+            'anchor': 'x',
+            'domain': [0.55, 1.0],
+            'title': 'CO2',
+            'showgrid': True,
+            'showline': False,
+            'mirror': False,
+              },
+    'yaxis2': {
+            'anchor': 'x2',
+            'domain': [0.55, 1.0],
+            'showticklabels': True,
+            'title': 'H2O',
+            'showgrid': True,
+            'showline': False,
+            'mirror': False,
+               },
+    'xaxis3': {
+        'anchor': 'y3',
+        'domain': [0.0, 0.2888888888888889],
+        'showgrid': True,
+        'showline': True,
+        'zeroline': False,
+        'linewidth': 2,
+    },
+
+    'xaxis4': {
+        'anchor': 'y4',
+        'domain': [0.35555555555555557, 0.6444444444444445],
+        'showgrid': True,
+        'showline': True,
+        'zeroline': False,
+        'linewidth': 2,
+    },
+    'xaxis5': {
+        'anchor': 'y5',
+        'domain': [0.7111111111111111, 1.0],
+        'showgrid': True,
+        'showline': True,
+        'zeroline': False,
+        'linewidth': 2,
+    },
+    'yaxis3': {
+        'anchor': 'x3',
+        'domain': [0.0, 0.45],
+        'title': 'NOx',
+        'showgrid': True,
+        'showline': False,
+    },
+    'yaxis4': {
+        'anchor': 'x4',
+        'domain': [0.0, 0.45],
+        'showticklabels': True,
+        'title': 'SOx',
+        'showgrid': True,
+        'showline': False,
+    },
+    'yaxis5': {
+        'anchor': 'x5',
+        'domain': [0.0, 0.45],
+        'showticklabels': True,
+        'title': 'PM',
+        'showgrid': True,
+        'showline': False,
+    }
+
+
+}
+
+emission=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=[],
+                    layout=emission_layout,
+                    ),
+                id="emission"
                 ),
             ],)
 
@@ -1031,6 +1212,9 @@ table=html.Div([html.H3(children="Table",
                 ])
 
 
+
+
+
 tab1_content =html.Div([
                     dbc.Card(
                         dbc.CardBody([
@@ -1057,7 +1241,7 @@ tab2_content = html.Div([
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col(DropdownCase_Oneyear,
-                                        sm=3,
+                                        sm=3.5,
                                         width={"offset": 1}
                                         ),
                                 dbc.Col(Slider,
@@ -1086,7 +1270,7 @@ tab3_content = html.Div([
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col(DropdownCase_Pie,
-                                        sm=3,
+                                        sm=3.5,
                                         width={"offset": 1}
                                         ),
                                 dbc.Col(radios_inputPie,
@@ -1110,17 +1294,17 @@ tab4_content = html.Div([
                         dbc.CardBody([
                             dbc.Row([
                                 dbc.Col(DropdownCase_Cost,
-                                        sm=4,
+                                        sm=3.5,
                                         width={"offset": 1}
                                         ),
                             ]),
                             dbc.Row([
                                 dbc.Col([
                                     costGraph,
-                                    IRP2019_Div,
-                                    CSIR_LC_Div,
-                                    IRP2019_2_Div,
-                                    CSIR_LC_2_Div,
+                                    IRP2019_Div_cost,
+                                    CSIR_LC_Div_cost,
+                                    IRP2019_2_Div_cost,
+                                    CSIR_LC_2_Div_cost,
                                 ],
                                     sm=10,
                                     width={"offset": 1}
@@ -1131,11 +1315,135 @@ tab4_content = html.Div([
                     className="mt-3",
                     )])
 
+line_type=['solid','longdashdot','dash','dot']
+
+colours_emission = [
+                'hsl(0, 0%, x%)',
+                'hsl(204, 97%, x%)',
+                'hsl(0, 100%, x%)',
+                'hsl(30, 100%, x%)',
+                'hsl(120, 100%, x%)',
+                ]
+
+
+tab5_content =html.Div([
+                    dbc.Card(
+                        dbc.CardBody([
+                            dbc.Row([
+                                dbc.Col(DropdownCase_emission,
+                                        sm=4,
+                                        width={"offset": 1}
+                                        ),
+                            ]),
+                            dbc.Row([
+                                dbc.Col([emission,
+                                        IRP2019_Div_emission,
+                                        CSIR_LC_Div_emission,
+                                        IRP2019_2_Div_emission,
+                                        CSIR_LC_2_Div_emission,
+                                         ],
+                                        sm=10,
+                                        width={"offset": 1}
+                                        ),
+                            ]),
+                            ]
+                        ),
+                        className="mt-3",
+                        )
+                    ])
+
+
+
+
+token = "pk.eyJ1IjoiamFja2x1byIsImEiOiJjajNlcnh3MzEwMHZtMzNueGw3NWw5ZXF5In0.fk8k06T96Ml9CLGgKmk81w"
+
+with urlopen('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/south-africa.geojson') as response:
+    SAD = json.load(response)
+
+des = []
+num = []
+
+
+for i in range(len(SAD['features'])):
+    des.append(SAD['features'][i]['properties']['name'])
+    num.append( round(10000*random()))
+
+# des
+for i, name in enumerate(des):
+    #     print(i)
+    SAD['features'][i]['id'] = name
+
+
+DATA_map= go.Choroplethmapbox(
+    geojson=SAD,
+    locations=des,
+    z=num,
+    colorscale="Bluered_r",
+    marker_line_width=0
+                                   )
+
+RSAlayout=dict(
+                autosize=True,
+                margin=go.layout.Margin(l=0, r=35, t=35, b=0,),
+                colorbar=dict(title="Colorbar",),
+                title="South Africa Overview",
+                mapbox=dict(
+                    accesstoken=token,
+                    center=dict(lat=-28, lon=22),
+                    style="light",
+                    zoom=4,
+                    ),
+                height=500,)
+
+MAP=html.Div([
+            dcc.Graph(
+                figure=dict(
+                    data=[DATA_map],
+                    layout=RSAlayout,
+                    ),
+                id="Map"
+
+                ),
+            ],
+            style={
+                # 'padding-top': 20,
+                'padding-bottom': 20,
+                # "width": '100%',
+                "height": '500',}
+
+            )
+
+
+
+
+tab6_content =html.Div([
+                    dbc.Card(
+                        dbc.CardBody([
+                            dbc.Row([
+                                dbc.Col(html.H5("Something to think about        (using random data)"),
+                                        sm=4,
+                                        width={"offset": 1}
+                                        ),
+                            ]),
+                            dbc.Row([
+                                dbc.Col([MAP,],
+                                        sm=10,
+                                        width={"offset": 1}
+                                        ),
+                            ]),
+                            ]
+                        ),
+                        className="mt-3",
+                        )
+                    ])
+
 tabs = dbc.Tabs([
         dbc.Tab(tab1_content, label="All the years"),
         dbc.Tab(tab2_content, label="One Year at a time "),
         dbc.Tab(tab3_content, label="Pie "),
         dbc.Tab(tab4_content, label="Cost "),
+        dbc.Tab(tab5_content, label="emission "),
+        dbc.Tab(tab6_content, label="Map "),
     ])
 
 
@@ -1553,10 +1861,10 @@ def update_output(DropdownValue,slider):
 
 @app.callback([
                 Output("costGraph", "figure"),
-                Output("IRP2019_Div", "hidden"),
-                Output("CSIR_LC_Div", "hidden"),
-                Output("IRP2019_2_Div", "hidden"),
-                Output("CSIR_LC_2_Div", "hidden"),
+                Output("IRP2019_Div_cost", "hidden"),
+                Output("CSIR_LC_Div_cost", "hidden"),
+                Output("IRP2019_2_Div_cost", "hidden"),
+                Output("CSIR_LC_2_Div_cost", "hidden"),
                ],
               [Input('DropdownCase_Cost', 'value'),],)
 def updatePowerGraph(DropdownValue):
@@ -1615,6 +1923,149 @@ def updatePowerGraph(DropdownValue):
 
     return figure, IRP2019, CSIR_LC,IRP2019_2,CSIR_LC_2
 
+
+
+
+@app.callback([
+                Output("emission", "figure"),
+                Output("IRP2019_Div_emission", "hidden"),
+                Output("CSIR_LC_Div_emission", "hidden"),
+                Output("IRP2019_2_Div_emission", "hidden"),
+                Output("CSIR_LC_2_Div_emission", "hidden"),
+               ],
+              [Input('DropdownCase_emission', 'value'),],)
+def updatePowerGraph(DropdownValue):
+    print("hey")
+    print(f'DropdownValue is {DropdownValue}')
+    print("hey 2")
+    # print(f'DropdownValue is {sliderValue}')
+    # print(f'DropdownValue is {type(sliderValue)}')
+    # print(f'SwitchesValue is {switchesValue}')
+
+    #######################################
+
+    IRP2019 = True
+    CSIR_LC = True
+    IRP2019_2 = True
+    CSIR_LC_2 = True
+
+    if "IRP2019" in DropdownValue:
+        IRP2019=False
+
+
+    if "CSIR_LC" in DropdownValue:
+        CSIR_LC=False
+
+
+    if "IRP2019_2" in DropdownValue:
+        IRP2019_2=False
+
+
+    if "CSIR_LC_2" in DropdownValue:
+        CSIR_LC_2=False
+
+    # scenariosDict[DropdownValue]
+    traces = []
+    cont=0
+    a=20
+    p=15
+    for i,case in enumerate(DropdownValue):
+        print(f"j is {case} ")
+        DF_cost=scenariosDict[case]["Energy produced"]
+
+
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['COA'],
+                name="COA  "+case,
+                legendgroup=case,
+                # fill='tozeroy',
+                line=dict(
+                    color=colours_emission[cont].replace("x", f"{a+p* i}"),
+                    width=4,
+                    dash=line_type[i],
+                ),
+                xaxis='x',
+                yaxis= 'y',
+               )
+            )
+        cont+=1
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['SPV'],
+                name="SPV  "+case,
+                legendgroup=case,
+                # fill='tozeroy',
+                line=dict(
+                    color=colours_emission[cont].replace("x", f"{a+p* i}"),
+                    width=4,
+                    dash=line_type[i],
+                ),
+                xaxis='x2',
+                yaxis= 'y2',
+               )
+            )
+        cont += 1
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['PEA'],
+                legendgroup=case,
+                name="PEA "+case,
+                # fill='tozeroy',
+                line=dict(
+                    color=colours_emission[cont].replace("x", f"{a+p* i}"),
+                    width=4,
+                    dash=line_type[i],
+                ),
+                xaxis='x3',
+                yaxis= 'y3',
+               )
+            )
+        cont += 1
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['WIN'],
+                name="WIN "+case,
+                legendgroup=case,
+                # fill='tozeroy',
+                line=dict(
+                    color=colours_emission[cont].replace("x", f"{a+p* i}"),
+                    width=4,
+                    dash=line_type[i],
+                ),
+                xaxis='x4',
+                yaxis= 'y4',
+               )
+            )
+        cont += 1
+        traces.append(
+            go.Scatter(
+                x=years,
+                y=DF_cost['GAS'],
+                name="GAS "+case,
+                legendgroup=case,
+                # fill='tozeroy',
+                line=dict(
+                    # color=colours_emission[i],
+                    color=colours_emission[cont].replace("x", f"{a+p* i}"),
+                    width=4,
+                    dash=line_type[i],
+                ),
+                xaxis='x5',
+                yaxis= 'y5',
+               )
+            )
+        cont=0
+
+
+
+    # print(traces)
+    figure = dict(data=traces, layout=emission_layout)
+    return figure, IRP2019, CSIR_LC,IRP2019_2,CSIR_LC_2
 
 #####################################################################
 
