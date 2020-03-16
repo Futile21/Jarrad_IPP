@@ -1154,6 +1154,7 @@ server = app.server
 
 app.layout = html.Div(children=[
     html.Div([navbar]),
+    html.Div([html.H1('DPV ask about')]),
     html.Div([
         dbc.Row([
             dbc.Col(Text_GenWind,
